@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | COVID Vaccination MS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="loading">
+
+<!-- Mobile overlay -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar"></aside>
+
+<!-- Main area -->
+<div class="main-area">
+    <header class="topbar">
+        <div style="display:flex;align-items:center;gap:14px;">
+            <button class="hamburger" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+            <span class="page-title">Dashboard</span>
+        </div>
+        <div class="topbar-right">
+            <span class="topbar-time" id="clock"></span>
+        </div>
+    </header>
+
+    <div class="content">
+
+<div class="page-header">
+    <h1>Welcome back, <span id="welcomeName"></span> 👋</h1>
+    <p>Here's what's happening with the COVID Vaccination System today.</p>
+</div>
+
+<!-- Stat cards -->
+<div class="stats">
+    <div class="stat primary">
+        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-value" data-stat="total_citizens">0</div>
+        <div class="stat-label">Total Citizens</div>
+    </div>
+    <div class="stat info">
+        <div class="stat-icon"><i class="fa-solid fa-hospital"></i></div>
+        <div class="stat-value" data-stat="total_centers">0</div>
+        <div class="stat-label">Centers</div>
+    </div>
+    <div class="stat purple">
+        <div class="stat-icon"><i class="fa-solid fa-vial"></i></div>
+        <div class="stat-value" data-stat="total_vaccines">0</div>
+        <div class="stat-label">Vaccines</div>
+    </div>
+    <div class="stat primary">
+        <div class="stat-icon"><i class="fa-solid fa-syringe"></i></div>
+        <div class="stat-value" data-stat="total_doses">0</div>
+        <div class="stat-label">Doses Given</div>
+    </div>
+    <div class="stat success">
+        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-value" data-stat="completed">0</div>
+        <div class="stat-label">Fully Vaccinated</div>
+    </div>
+    <div class="stat warning">
+        <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-value" data-stat="pending">0</div>
+        <div class="stat-label">Pending Doses</div>
+    </div>
+    <div class="stat danger">
+        <div class="stat-icon"><i class="fa-solid fa-user-xmark"></i></div>
+        <div class="stat-value" data-stat="unvaccinated">0</div>
+        <div class="stat-label">Not Vaccinated</div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3><i class="fa-solid fa-chart-line" style="color:var(--primary);margin-right:6px"></i>Monthly Vaccination Trend</h3>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+        <h3><i class="fa-solid fa-chart-pie" style="color:var(--success);margin-right:6px"></i>Doses by Vaccine</h3>
+        <div class="chart-wrap"><canvas id="vaccineChart"></canvas></div>
+    </div>
+</div>
+
+<!-- Recent vaccinations -->
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fa-solid fa-clock-rotate-left" style="color:var(--primary);margin-right:6px"></i>Recent Vaccinations</h2>
+        <div class="card-actions">
+            <a class="btn btn-success btn-sm" href="vaccinations.html" data-role="staff"><i class="fa-solid fa-plus"></i> Record Dose</a>
+            <a class="btn btn-ghost btn-sm" href="reports.html"><i class="fa-solid fa-chart-bar"></i> All Reports</a>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Citizen</th><th>Vaccine</th><th>Center</th><th>Date</th></tr></thead>
+            <tbody id="recent"></tbody>
+        </table>
+    </div>
+</div>
+
+    </div><!-- .content -->
+    <footer class="footer">
+        DBMS Project &middot; COVID Vaccination Management System &middot; Node.js + MySQL 8.0
+    </footer>
+</div><!-- .main-area -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

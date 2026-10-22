@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | COVID Vaccination Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+<div class="login-wrap">
+    <div class="login-logo">
+        <div class="icon-wrap"><i class="fa-solid fa-syringe"></i></div>
+        <h1>COVID Vaccination<br>Management System</h1>
+        <p>DBMS Project &middot; Node.js + MySQL 8.0</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Welcome back</h2>
+        <p class="sub">Sign in to access the dashboard.</p>
+
+        <div id="alertBox"></div>
+
+        <form method="post" id="loginForm">
+            <div class="field">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="username" name="username"
+                           placeholder="Enter username"
+                           autocomplete="username" required>
+                </div>
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" name="password"
+                           placeholder="Enter password"
+                           autocomplete="current-password" required>
+                    <button type="button" class="toggle-pw" onclick="togglePw()">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+
+        <div class="demo-creds">
+            <p>Demo Credentials</p>
+            <div class="cred-row">
+                <span><strong>admin</strong> / Admin@123</span>
+                <span class="badge badge-admin">Admin</span>
+                <button class="use-btn" onclick="fill('admin','Admin@123')">Use</button>
+            </div>
+            <div class="cred-row">
+                <span><strong>staff</strong> / Staff@123</span>
+                <span class="badge badge-staff">Staff</span>
+                <button class="use-btn" onclick="fill('staff','Staff@123')">Use</button>
+            </div>
+            <div class="cred-row">
+                <span><strong>viewer</strong> / Viewer@123</span>
+                <span class="badge badge-viewer">Viewer</span>
+                <button class="use-btn" onclick="fill('viewer','Viewer@123')">Use</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function togglePw() {
+    const p = document.getElementById('password');
+    const i = document.getElementById('eyeIcon');
+    if (p.type === 'password') { p.type = 'text';     i.className = 'fa-solid fa-eye-slash'; }
+    else                       { p.type = 'password'; i.className = 'fa-solid fa-eye'; }
+}
+function fill(u, p) {
+    document.getElementById('username').value = u;
+    document.getElementById('password').value = p;
+}
+function showError(msg) {
+    const box = document.getElementById('alertBox');
+    box.innerHTML = '<div class="alert"><i class="fa-solid fa-circle-exclamation"></i> </div>';
+    box.firstChild.append(msg);
+}
+document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    if (username === '' || password === '') return showError('Please enter both username and password.');
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (data.ok) location.href = 'index.html';
+        else showError(data.error);
+    } catch {
+        showError('Could not reach the server. Make sure it is running.');
+    }
+});
+</script>
+</body>
+</html>

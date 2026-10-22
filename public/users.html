@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | COVID Vaccination MS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="loading">
+
+<!-- Mobile overlay -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar"></aside>
+
+<!-- Main area -->
+<div class="main-area">
+    <header class="topbar">
+        <div style="display:flex;align-items:center;gap:14px;">
+            <button class="hamburger" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+            <span class="page-title">User Management</span>
+        </div>
+        <div class="topbar-right">
+            <span class="topbar-time" id="clock"></span>
+        </div>
+    </header>
+
+    <div class="content">
+
+<div class="page-header">
+    <h1><i class="fa-solid fa-user-shield" style="color:var(--primary);margin-right:8px"></i>User &amp; Access Management</h1>
+    <p>Role-based access control (RBAC): Administrators, Staff, and Read-Only Viewers.</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fa-solid fa-user-plus" style="color:var(--success);margin-right:6px"></i>Create New User</h2>
+    </div>
+    <form method="post" id="createForm">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required maxlength="50" placeholder="e.g. nurse_priya">
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" required maxlength="100" placeholder="e.g. Priya Nair">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role" required>
+                    <option value="viewer">Viewer (Read-only)</option>
+                    <option value="staff">Staff (Can add &amp; edit records)</option>
+                    <option value="admin">Administrator (Full control)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Initial Password</label>
+                <input type="password" name="password" required minlength="6" placeholder="Min. 6 characters">
+            </div>
+            <div class="form-group" style="justify-content:flex-end;">
+                <label>&nbsp;</label>
+                <button class="btn btn-success" type="submit">
+                    <i class="fa-solid fa-user-check"></i> Create Account
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fa-solid fa-users-gear" style="color:var(--primary);margin-right:6px"></i>Active Accounts</h2>
+        <span style="font-size:13px;color:var(--muted)" id="count"></span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+        </table>
+    </div>
+</div>
+
+    </div><!-- .content -->
+    <footer class="footer">
+        DBMS Project &middot; COVID Vaccination Management System &middot; Node.js + MySQL 8.0
+    </footer>
+</div><!-- .main-area -->
+
+<script src="js/main.js"></script>
+<script src="js/users.js"></script>
+</body>
+</html>
