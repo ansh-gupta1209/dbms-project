@@ -37,7 +37,7 @@ const App = (() => {
         });
         if (res.status === 401 && !url.startsWith('/api/auth/login')) {
             location.href = 'login.html';
-            throw new Error('Not signed in');
+            return new Promise(() => {}); // page is leaving; never resolve
         }
         let data;
         try { data = await res.json(); } catch { data = { ok: false, error: 'Unexpected server response.' }; }
@@ -125,7 +125,7 @@ const App = (() => {
         const data = await api('GET', '/api/auth/me');
         if (!data.ok) {
             location.href = 'login.html';
-            throw new Error('Not signed in');
+            return new Promise(() => {});
         }
         user = data.user;
         renderSidebar();
@@ -145,8 +145,8 @@ const App = (() => {
     async function send(method, url, body, redirectTo) {
         try {
             await api(method, url, body);
-        } catch (e) {
-            if (e.message === 'Not signed in') return;
+        } catch {
+            // network failure: reload anyway so the page reflects the current state
         }
         location.href = redirectTo;
     }
