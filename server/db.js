@@ -5,21 +5,42 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 
-const config = {
-    host:     process.env.DB_HOST || '127.0.0.1',
-    port:     Number(process.env.DB_PORT || 3306),
-    user:     process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'covid_vaccination',
-};
+/**
+ * Connection settings: either a single DATABASE_URL
+ * (e.g. mysql://user:pass@host:port/db?ssl-mode=REQUIRED, as given by Aiven)
+ * or the individual DB_* variables.
+ */
+function readConfig() {
+    if (process.env.DATABASE_URL) {
+        const u = new URL(process.env.DATABASE_URL);
+        const sslMode = (u.searchParams.get('ssl-mode') || u.searchParams.get('sslmode') || '').toUpperCase();
+        return {
+            host:     u.hostname,
+            port:     Number(u.port || 3306),
+            user:     decodeURIComponent(u.username),
+            password: decodeURIComponent(u.password),
+            database: process.env.DB_NAME || decodeURIComponent(u.pathname.slice(1)) || 'covid_vaccination',
+            ssl:      sslMode && sslMode !== 'DISABLED' ? { rejectUnauthorized: false } : undefined,
+        };
+    }
+    return {
+        host:     process.env.DB_HOST || '127.0.0.1',
+        port:     Number(process.env.DB_PORT || 3306),
+        user:     process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'covid_vaccination',
+        ssl:      process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
+    };
+}
+
+const config = readConfig();
 
 const pool = mysql.createPool({
     ...config,
     charset: 'UTF8MB4_UNICODE_CI', // match the database collation used by the views
     dateStrings: true,          // return DATE/DATETIME as 'YYYY-MM-DD' strings, like PHP did
     waitForConnections: true,
-    connectionLimit: 10,
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
+    connectionLimit: 5,
 });
 
 /**
@@ -52,4 +73,4 @@ async function ensureUsersTable() {
     }
 }
 
-module.exports = { pool, config, ensureUsersTable };
+module.exports = { pool, config, readConfig, ensureUsersTable };

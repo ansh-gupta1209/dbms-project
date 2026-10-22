@@ -19,7 +19,13 @@ App.init().then(async () => {
     }));
 
     const me = Number(App.user.id);
-    const { rows = [] } = await App.api('GET', '/api/users');
+    const res = await App.api('GET', '/api/users');
+    if (!res.ok) {
+        // Not an administrator: the server queued "Administrator access required."
+        location.href = 'index.html';
+        return;
+    }
+    const rows = res.rows;
     document.getElementById('count').textContent = `${rows.length} account(s) registered`;
 
     const tbody = document.getElementById('rows');

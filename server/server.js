@@ -1,19 +1,22 @@
 /**
  * COVID Vaccination Management System - Node.js / Express Server
  * Serves the HTML/CSS/JS frontend from /public and a JSON API under /api.
+ * In production the frontend is hosted on Vercel, which proxies /api/* and /logout here (Render).
  */
 require('dotenv').config({ quiet: true });
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
-const { ensureUsersTable, config } = require('./db');
+const MySQLStore = require('express-mysql-session')(session);
+const { pool, ensureUsersTable, config } = require('./db');
 const { isLoggedIn, isAdmin, requireAuth, requireAdmin } = require('./middleware');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
-if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+// Behind Render's / Vercel's HTTPS proxies: trust X-Forwarded-* so secure cookies work
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', true);
 
 app.use(express.json());
 app.use(session({
@@ -21,6 +24,8 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'change-this-session-secret',
     resave: false,
     saveUninitialized: false,
+    // Sessions live in MySQL so logins survive server restarts / free-tier sleep
+    store: new MySQLStore({ createDatabaseTable: true, clearExpired: true }, pool),
     cookie: {
         httpOnly: true,
         sameSite: 'lax',
@@ -53,6 +58,7 @@ app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/login.
 // ---------------------------------------------------------------------
 // JSON API
 // ---------------------------------------------------------------------
+app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/auth',         require('./routes/auth'));
 app.use('/api/dashboard',    requireAuth, require('./routes/dashboard'));
 app.use('/api/citizens',     requireAuth, require('./routes/citizens'));

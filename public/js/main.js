@@ -123,6 +123,10 @@ const App = (() => {
     /** Bootstraps every authenticated page; resolves with the signed-in user */
     async function init() {
         const data = await api('GET', '/api/auth/me');
+        if (!data.ok) {
+            location.href = 'login.html';
+            throw new Error('Not signed in');
+        }
         user = data.user;
         renderSidebar();
         applyRoleVisibility();

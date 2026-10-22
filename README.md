@@ -39,6 +39,8 @@ dbms-project/
 │   ├── 05_analytical_queries.sql # 12 Benchmark SQL Evaluation Queries
 │   └── complete_setup.sql    # 1-Click Complete Database Import Script
 ├── scripts/setup-db.js       # `npm run setup-db` – imports complete_setup.sql
+├── vercel.json               # Vercel: serve /public, proxy /api to Render
+├── render.yaml               # Render Blueprint for the Node.js API
 ├── docs/                     # Project Report, Viva Guide, Architecture
 ├── .env.example              # Database / server configuration template
 └── package.json
@@ -46,34 +48,42 @@ dbms-project/
 
 ---
 
-## 🚀 Quick Start Guide
+## 🌐 Live Deployment Architecture
 
-### 1. Prerequisites
-- **Node.js 18+** — https://nodejs.org
-- **MySQL 8.0** (standalone MySQL Server, or just the MySQL module of XAMPP — Apache/PHP are **not** needed)
+```
+Browser ──► Vercel (static HTML/CSS/JS from /public)
+              │  /api/*  and  /logout  are proxied (vercel.json rewrites)
+              ▼
+            Render (Node.js + Express API, render.yaml)
+              │  TLS, MySQL protocol
+              ▼
+            Aiven (managed MySQL 8.0: tables, trigger, views, sessions)
+```
+Because Vercel proxies the API, the browser sees a single origin, so session cookies work with no CORS setup.
 
-### 2. Install
+### Deploy it yourself
+1. **Database – Aiven:** create a free MySQL service and copy its **Service URI**.
+   Put `DATABASE_URL=<Service URI>` in `.env`, then run `npm install && npm run setup-db` to create the schema and seed data.
+2. **API – Render:** New → **Blueprint** → select this repo (uses `render.yaml`) and paste the same `DATABASE_URL`.
+   Note the service URL, e.g. `https://covid-vaccination-api.onrender.com`.
+3. **Frontend – Vercel:** import this repo (no build step; `vercel.json` serves `public/`).
+   If your Render URL differs, update the two `destination` URLs in `vercel.json`.
+
+> Render's free plan sleeps after 15 minutes idle, so the first request after a pause can take ~30–60 s.
+
+---
+
+## 💻 Run Locally (optional)
+
+Requirements: **Node.js 18+** and any MySQL 8.0 server (local or the Aiven one).
 ```bash
 git clone https://github.com/ansh-gupta1209/dbms-project.git
 cd dbms-project
 npm install
-cp .env.example .env        # Windows: copy .env.example .env
+cp .env.example .env        # set DATABASE_URL or the DB_* values
+npm run setup-db            # ⚠️ drops & recreates the tables with seed data
+npm start                   # http://localhost:3000
 ```
-Edit `.env` if your MySQL user / password differ from `root` / *(empty)*.
-
-### 3. Create the Database
-```bash
-npm run setup-db
-```
-This runs `database/complete_setup.sql` (tables, constraints, trigger, views and seed data).
-⚠️ It drops and recreates the tables, so existing data in `covid_vaccination` is replaced.
-*(Alternatively, import `database/complete_setup.sql` from MySQL Workbench or phpMyAdmin.)*
-
-### 4. Run
-```bash
-npm start
-```
-Open 👉 **http://localhost:3000** (redirects to the login page)
 
 ---
 
@@ -98,17 +108,6 @@ Open 👉 **http://localhost:3000** (redirects to the login page)
 
 All queries use parameterized prepared statements (`mysql2`), and MySQL error codes
 (1062 duplicate, 1451/1452 foreign key, 3819/4025 CHECK, 1644 trigger SIGNAL) are mapped to friendly messages.
-
----
-
-## ☁️ Deploying Online (optional)
-
-GitHub stores the code; to run it on the internet you need a Node.js host plus a MySQL database:
-1. Create a MySQL 8 database on a cloud provider (e.g. Aiven, Railway, TiDB Cloud).
-2. Run `npm run setup-db` locally with `.env` pointing at that database (set `DB_SSL=true` if required).
-   Some providers need `log_bin_trust_function_creators=1` to allow the trigger.
-3. Create a **Web Service** on Render / Railway from this GitHub repo with build command `npm install`,
-   start command `npm start`, and the `DB_*`, `SESSION_SECRET` and `NODE_ENV=production` environment variables.
 
 ---
 

@@ -79,6 +79,9 @@ function fill(u, p) {
     document.getElementById('username').value = u;
     document.getElementById('password').value = p;
 }
+// Already logged in → go to dashboard (also wakes the API server if it was asleep)
+fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.ok) location.href = 'index.html'; }).catch(() => {});
+
 function showError(msg) {
     const box = document.getElementById('alertBox');
     box.innerHTML = '<div class="alert"><i class="fa-solid fa-circle-exclamation"></i> </div>';
